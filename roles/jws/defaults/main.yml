@@ -9,6 +9,7 @@ jws_version: 5.6.0
 tomcat_version: 9.0.60
 tomcat_zipfile: "apache-tomcat-{{ tomcat_version }}.zip"
 tomcat_zipfile_url: "https://archive.apache.org/dist/tomcat/tomcat-9/v{{ tomcat_version }}/bin/{{ tomcat_zipfile }}"
+tomcat_force_install: false
 
 tomcat_user: tomcat
 tomcat_uid: 53
@@ -32,9 +33,10 @@ tomcat_shutdown_port: '8005'
 tomcat_listen_http_port: '8080'
 tomcat_listen_http_bind_address: 'localhost'
 tomcat_listen_http_enabled: 'yes'
+
+tomcat_listen_https_enabled: False
 tomcat_listen_https_port: '8443'
 tomcat_listen_https_bind_address: 'localhost'
-tomcat_listen_https_enabled: 'False'
 tomcat_listen_https_servername: 'My Server'
 tomcat_listen_https_threads_max: 150
 tomcat_listen_https_connection_timeout: 6000
@@ -43,7 +45,7 @@ tomcat_listen_https_keystore_file: /etc/ssl/keystore.jks
 tomcat_listen_https_keystore_password: changeit
 tomcat_listen_https_client_auth: false
 
-tomcat_listen_ajp_enabled: 'False'
+tomcat_listen_ajp_enabled: False
 tomcat_listen_ajp_address: '::1'
 tomcat_listen_ajp_port: '8009'
 tomcat_listen_ajp_secretRequired: 'True'

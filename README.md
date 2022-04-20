@@ -144,6 +144,60 @@ All that you have to do to enable a mod_cluster listener for jws is to edit the 
 - `tomcat_modcluster_ip` (Set the ip of the mod_cluster instance)
 - `tomcat_modcluster_port` (Set the port of the mod_cluster instance)
 
+(This feature is validated and tested by the following [Molecule scenario](https://github.com/ansible-middleware/jws-ansible-playbook/tree/main/molecule/ajp) )
+
+## Enable HTTPS
+
+The default template for server.xml provided with this Ansible collection already includes the required configuration to use HTTPS. It just need to be activated. However, the collection does not build, nor provide the requires SSH keys and Java Keystore. It expects it to be already installed and available.
+
+    tomcat_listen_https_enabled: True
+    # uncomment the following line to change the default value for the java keystore path
+    #tomcat_listen_https_keystore_file: /etc/ssl/keystore.jks
+
+Please refers to the [server documentation](https://tomcat.apache.org/tomcat-9.0-doc/ssl-howto.html#Quick_Start) for more details on the setup and configuration of this feature.
+
+Note: There other collections and modules available to automate the creation of those files (such as [Ansible OpenSSH Keypair collection](https://docs.ansible.com/ansible/latest/collections/community/crypto/openssh_keypair_module.html), [Ansible Collection Community Crytpo](https://docs.ansible.com/ansible/latest/collections/community/crypto/index.html) and the [Java Keystore module](https://docs.ansible.com/ansible/latest/collections/community/general/java_keystore_module.html)). Please refers to those in order to automate this part.
+
+(This feature is validated and tested by the following [Molecule scenario](https://github.com/ansible-middleware/jws-ansible-playbook/tree/main/molecule/https) )
+
+## Overriding the default template for server.xml
+
+The provided template for the server.xml.j2 covers the most basic use case of the server. It's most likely that a user will need to replace this template by its own, it order to deploy a fine-grained configuration, suiting one's use case. To do so, just change of this default variable:
+
+    tomcat_conf_templates_server: path/to/my_template_for_server_xml.j2
+
+(This feature is validated and tested by the following [Molecule scenario](https://github.com/ansible-middleware/jws-ansible-playbook/tree/main/molecule/override_server_xml) )
+
+## How to deploy webapps?
+
+Simply use Ansible existing module! For instance, you can use the [get_url:](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html) module to deploy a webapp downloaded from a repository:
+
+    - name: Download App
+      get_url:
+        url: https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.7.1/jolokia-war-1.7.1.war
+        dest: "{{ tomcat_home }}/webapps/"
+
+Another option is to use the [copy:](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html) module that allow to deploy a file from the Ansible controller to the target:
+
+   ansible.builtin.copy:
+       src: files/jolokia-war-1.7.1.war
+       dest: "{{ tomcat_home }}/webapps/"
+
+This module can also be used if the file already exists on the target host:
+
+   ansible.builtin.copy:
+       src: files/jolokia-war-1.7.1.war
+       dest: "{{ tomcat_home }}/webapps/"
+       remote_src: yes
+
+However, to avoid duplicating the files, a symlink or hardlink can also be used instead using the module [file:](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html):
+
+    - ansible.builtin.file:
+        src: /apps/jolokia-war-1.7.1.war
+        dest: "{{ tomcat_home }}/webapps/jolokia-war-1.7.1.war"
+        state: link
+
+Bottom line: Ansible has many features to help deploy webapps into the appropriate directory for the server!
 
 ## Running Playbook
 
